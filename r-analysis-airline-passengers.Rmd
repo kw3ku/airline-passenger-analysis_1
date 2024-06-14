@@ -1,0 +1,133 @@
+---
+title: "passenger"
+author: "foster"
+date: "2024-06-14"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+install.packages("forecast")
+install.packages("tseries")
+install.packages("psycho")
+
+```
+
+library(tidyverse)
+library(forecast)
+library(tseries)
+library(dplyr)
+library(tibble)
+
+### load the dataset
+
+data("AirPassengers")
+
+ts_data <- AirPassengers
+
+theplot1 <- autoplot(ts_data) +
+  ggtitle("Monthly Totals of International Airline Passengers") +
+  xlab("Year") +
+  ylab("Number of Passengers") +
+  theme_classic()
+
+```{r}
+
+plot(theplot1)
+```
+ggsave("~/Desktop/ts_plot.png", theplot1)
+
+# Decompose the time series
+decomposed <- decompose(ts_data)
+
+# Plot the decomposed components (this provides the data in different categories)
+# the different decomposed data results
+theplot2 <- autoplot(decomposed) +
+  ggtitle("Decomposed Time Series Components") +
+  theme_classic()
+
+```{r}
+
+plot(theplot2)
+
+```
+ggsave("~/Desktop/decomposed_plot.png", theplot2)
+
+
+# Fit the ARIMA model
+arima_model <- auto.arima(ts_data)
+
+# Summary of the model
+summary(arima_model)
+
+# Forecast using the ARIMA model
+arima_forecast <- forecast(arima_model, h = 24)
+
+# Plot the forecast
+theplot3 <- autoplot(arima_forecast) +
+  ggtitle("ARIMA Model Forecast") +
+  xlab("Year") +
+  ylab("Number of Passengers") +
+  theme_minimal()
+
+```{r}
+
+plot(theplot3)
+
+```
+
+ggsave("~/Desktop/arima_forecast.png", theplot3)
+
+# Fit the ETS model
+ets_model <- ets(ts_data)
+
+# Summary of the model
+summary(ets_model)
+
+
+# Forecast using the ETS model
+ets_forecast <- forecast(ets_model, h = 24)
+
+# Plot the forecast
+theplot4 <- autoplot(ets_forecast) +
+  ggtitle("ETS Model Forecast") +
+  xlab("Year") +
+  ylab("Number of Passengers") +
+  theme_classic()
+
+
+ggsave("~/Desktop/ets_forecast.png", theplot4)
+
+
+# Fit the ETS model
+ets_model <- ets(ts_data)
+
+# Summary of the model
+summary(ets_model)
+
+# Forecast using the ETS model
+ets_forecast <- forecast(ets_model, h = 24)
+
+
+# Calculate accuracy metrics for ARIMA model
+arima_accuracy <- accuracy(arima_forecast)
+
+# Calculate accuracy metrics for ETS model
+ets_accuracy <- accuracy(ets_forecast)
+
+# Display the accuracy metrics
+
+```{r}
+print("ARIMA Model Accuracy:")
+print(arima_accuracy)
+
+```
+
+print("ETS Model Accuracy:")
+print(ets_accuracy)
+
+
+### To compare which of the models is best, we look at the summary values. The smaller one ### was indicative of the model prediction power. 
+
+
+
